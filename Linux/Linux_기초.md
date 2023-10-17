@@ -1,35 +1,82 @@
 # Linux 기초
 1. AWS Free-tier 계정으로 EC2 Amazon Linux2 인스턴스(t2a.micro)를 생성하고 ssh로 접속해보세요.
     - 위 sshd 접속 과정을 설명해주세요.
+        1. 클라이언트 : ssh-keygen > 키페어(id_rsa, id_rsa_pub) 생성
+        2. 공개키 > 서버(ssh-copy-id, authorized_keys), 개인키 > 클라이언트(id_rsa)
+        3. ssh -i *.pem user@10.0.0.3(서버 접속) > 공개키로 난수 생성 후 클라이언트 전달
+        4. 클라이언트 > 개인키로 난수 암호화 후 서버 전달
+        5. 서버 > 전송받은 값을 공개키로 복호화하고 자신의 난수와 비교, 일치하면 접속 허용
     - 퍼블릭 키는 어디에 있나요?
+        - 클라이언트 > ~/.ssh/id_rsa.pub
+        - 서버 > ~/.ssh/authorized_keys
     - 리눅스 내부에서 접속 포트 번호를 22에서 2022로 변경하려면 어떻게 할까요?
+        ```bash
+        # 보안그룹 또는 방화벽에서 2022 포트 개방 선행
+        # 주석 제거 및 포트 번호 변경
+        $vi /etc/ssh/sshd_config
+        ...
+        #Port 22 > Port 2022
+
+        $systemctl restart sshd
+        ```
 2. 현재 사용 중인 리눅스의 파일 시스템을 조회하는 명령어를 입력하고 결과를 작성해주세요.
+    - df -T 또는 mount | grep ^/dev
 3. 최상위 루트 디렉토리('/')의 하위 디렉토리를 간략하게 설명해주세요.
-    - /bin
-    - /dev
-    - /etc
-    - /lib
-    - /mnt
-    - /proc
-    - /usr
+    - /bin : Binary, 기본적인 명령어
+    - /dev : Device, 물리적으로 연결된 하드웨어 관련 파일
+    - /etc : 환경 설정 파일
+    - /lib : Library, 커널이 필요로 하는 라이브러리 파일(shared object)
+    - /mnt: Mount, mount 명령어를 통해 직접 연결한 마운트 포인트가 저장됨 
+    - /proc: Process, 현재 실행 중인 프로세스 정보
+    - /usr: User, 일반 사용자가 설치한 프로그램
 4. 현재 사용 중인 쉘과 사용 가능한 쉘의 목록을 확인하는 명령어를 각각 입력해주세요.
+    - grep [user] /etc/passwd, cat /etc/shells
     - 쉘이란 무엇일까요?
+        - 사용자와 OS간 명령어 인터페이스
+        - 명령어 입력 시 커널이 이해하도록 해석, 자식 프로세스 fork & exec하여 명령어 처리, stdin & stdout을 통해 주고받음
 5. ls 명령어를 입력하면 현재 디렉토리 내 파일과 디렉토리의 목록을 반환합니다. 해당 명령어의 입력부터 출력까지의 과정을 설명해주세요.
     > 작성 키워드 : **fork & exec(system call)**
+        1. shell : stdin > ls 명령어 전달 및 해석
+        2. fork : 자식 프로세스 생성
+        3. exec : 자식 프로세스 > ls 프로그램 overwrite
+        4. 명령어 실행 : stdout > 부모 프로세스(쉘)에 결과 반환
     - system call이란 무엇일까요?
+        - User mode의 프로세스가 Kernel mode의 자원에 접근하기 위한 인터페이스
 6. ps -ef | grep "/bin/sh" 명령어를 입력해보시고, 파이프라인('**|**') 문자가 어떤 기능인지 설명해주세요.
+    - 파이프라인으로 연결된 명령어는 앞 명령어의 출력(stdout)을 받기 위해 대기하고 받은 결과를 stdin으로 입력 받아 동작합니다.
     - 마찬가지로 ls | sort | cd /home/ec2-user 명령어를 입력하고, 어떤 내용이 출력되는지 작성해주세요.
         - 만약 출력되지 않는다면 그 이유를 설명해주세요.
+            - ls 출력(stdout)이 자식 프로세스(cd)로 넘어가므로 부모 프로세스(Shell)는 출력을 받을 수 없다.
 7. pstree 명령어를 입력해주세요.
     - 최상단 프로세스(init 또는 systemd)의 역할은 무엇인지 설명해주세요.
+        - 부팅 시 최초 실행 프로세스(PID : 1)
+        - 이 프로세스를 fork하여 부팅 시 필요한 모든 프로세스를 실행한다.
     - init과 systemd의 차이점을 설명해주세요.
+        - init > /etc/rd.d 하위 연결한 스크립트와 서비스를 순차적으로 실행 > 호위 효과 발생
+        - systemd > 의존성을 만족하는 서비스는 병렬로 실행하고 의존성이 있는 서비스는 순차적으로 실행한다.
+            - 의존 관계 : 서비스 A > 서비스 B, 서비스 C > 서비스 D인 경우 : 서비스 B, D 병렬 실행 후 서비스 A, C 순차 실행
 8. 네이버(www.naver.com)의 IP 주소를 확인하는 명령어는 무엇인가요?
     - 실행 결과(IP 주소)를 받는 과정을 설명해주세요(DNS 질의 과정)
-    - /etc/hosts와 /etc/resolv.conf의 차이점을 설명해주세요.
-9. curl, telnet, ping의 차이점을 설명해주세요.
+        1. Local DNS Cache > 이전 질의 결과 확인
+        2. /etc/hosts > 호스트 네임과 IP 주소 매핑 정보 확인
+        3. /etc/resolv.conf > 지정된 DNS 서버에 질의 전달
+            - Root : .com(TLD) 서버 정보 전달
+            - TLD : naver.com(SLD) 서버 정보 전달
+            - SLD : IP 주소 정보 전달
+9. curl, telnet, ping 차이점을 설명해주세요.
+    - curl : Application(HTTP 등) Layer 동작
+    - telnet : Transport(TCP) Layer 동작
+    - ping : Network Layer(ICMP) 동작 - 포트 사용 X
 10. yum 패키지를 통해 httpd를 설치하고, 80 포트를 개방하여 서비스를 실행해주세요.
     - yum과 apt의 차이점은 무엇인가요?
+        - yum : RedHat, .rpm 확장자
+        - apt : Debian, .deb 확장자
     - httpd 포트 상태(LISTEN…)를 확인하는 명령어를 입력하고 결과를 작성해주세요.
+        ```bash
+        $yum install net-tools
+        $apt-get install net-tools
+        $netstat -tnp | grep "httpd"
+        ```
 11. 다음은 리소스 모니터링을 수행하는 명령어 중 top 명령어를 수행한 결과입니다. 각각의 값이 무엇을 의미하는지 설명해주세요.
     ```bash
     $top
@@ -46,20 +93,51 @@
     16  eljoelee 20   0    6200   5028   3316  S   0.0   0.1   0:00.02  bash
     27  eljoelee 20   0    7788   3268   2904  R   0.0   0.0   0:00.00  top
     ```
-    - load average
-    - tasks
-        - sleeping
-        - zombie
-    - Cpu(s)
-        - hi
-        - si
-    - MiB
-        - buff/cache
-    - PR
-    - VIRT
-    - RES
-    - SHR
-    - MEM
+    - load average : CPU 자원을 사용하고 있는 실행 중인 프로세스 수 + I/O 작업 완료 대기 프로세스의 평균 수를 1/5/15분 단위로 나타낸 값
+    - tasks : 프로세스 개수
+        - sleeping : I/O 작업 완료 대기 프로세스 수
+        - zombie : 부모 프로세스가 종료된 자식 프로세스 수
+    - Cpu(s) : cpu 사용률
+        - hi : 하드웨어 인터럽트(비동기 인터럽트, I/O 인터럽트)
+        - si : 소프트웨어 인터럽트(동기 인터럽트, Exception, CPU가 명령어 수행 중 발생한 예외 또는 System Call 등)
+    - MiB : 메모리 사용률
+        - buff/cache : bufferd I/O 메모리 + 캐시 메모리 사용률
+    - PR : CPU 스케줄링 우선순위
+    - VIRT : 프로세스가 사용하는 가상 메모리 양(code, data, heap, stack)
+    - RES : 프로세스가 사용하는 non-swapped 물리 메모리(RAM) 양
+        - non-swapped Physical Memory : Swap-out되지 않고 RAM에 남아있는 메모리
+    - SHR : 다른 프로세스와 공유하는 공유 메모리 양
+    - MEM : 물리 메모리(RAM)에서 RES가 차지하는 비율
 12. 메모리 사용량을 확인하는 명령어를 입력하고 결과를 작성해주세요.
     - swap이란 항목은 무엇을 의미하는 걸까요?
+        - 하드 디스크의 일부를 RAM처럼 사용하는 가상 메모리의 일부 영역
         - 2GB 가량의 swap 메모리를 설정하고 메모리 사용량을 확인하는 명령어를 통해 결과를 작성해주세요.
+            ```bash
+            # fallocate 또는 dd 명령어로 파일 생성 가능
+            $fallocate -l 2GB /swapfile
+
+            # bs(블록 크기): 128M * count(블록 개수): 16 = 2GB
+            $dd if=/dev/zero of=/swapfile bs=128M count=16
+
+            # 읽기/쓰기 권한 부여
+            $chmod 600 /swapfile
+
+            # swap 영역 생성
+            $mkswap /swapfile
+
+            # swap 영역 활성화
+            $swapon /swapfile
+
+            # 부팅 시 자동 활성화
+            $vi /etc/fstab
+            /swapfile swap swap defaults 0 0
+
+            # 영역 확인
+            $free -h
+
+            # swap 영역 비활성화
+            $swapoff /swapfile
+
+            # swap 파일 삭제
+            $rm -rf /swafile
+            ```
