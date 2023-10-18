@@ -1,11 +1,14 @@
 # Linux 기초
 1. AWS Free-tier 계정으로 EC2 Amazon Linux2 인스턴스(t2a.micro)를 생성하고 ssh로 접속해보세요.
     - 위 sshd 접속 과정을 설명해주세요.
-        1. 클라이언트 : ssh-keygen > 키페어(id_rsa, id_rsa_pub) 생성
-        2. 공개키 > 서버(ssh-copy-id, authorized_keys), 개인키 > 클라이언트(id_rsa)
-        3. ssh -i *.pem user@10.0.0.3(서버 접속) > 공개키로 난수 생성 후 클라이언트 전달
-        4. 클라이언트 > 개인키로 난수 암호화 후 서버 전달
-        5. 서버 > 전송받은 값을 공개키로 복호화하고 자신의 난수와 비교, 일치하면 접속 허용
+        1. 클라이언트 : ssh-keygen > Key Pair(~/.ssh/{id_rsa, id_rsa_pub}) 생성
+        2. ssh-copy-id > 서버로 공개키 전달 또는 ~/.ssh/authorized_keys) 직접 등록
+        3. ssh [user]@[ip] > 공개키와 함께 인증 요청 전달
+        4. 서버 : 전달 받은 공개키 > authorized_keys 등록 확인
+        5. 난수와 해시 값을 생성한다.
+        6. 공개키 > 난수 암호화 후 전달
+        7. 클라이언트 : 개인키 > 전달 받은 난수 복호화 후 결과 값으로 해시 값 생성 및 전달
+        8. 서버 : 자신의 해시 값과 비교, 일치하면 인증 성공
     - 퍼블릭 키는 어디에 있나요?
         - 클라이언트 > ~/.ssh/id_rsa.pub
         - 서버 > ~/.ssh/authorized_keys
@@ -22,13 +25,15 @@
 2. 현재 사용 중인 리눅스의 파일 시스템을 조회하는 명령어를 입력하고 결과를 작성해주세요.
     - df -T 또는 mount | grep ^/dev
 3. 최상위 루트 디렉토리('/')의 하위 디렉토리를 간략하게 설명해주세요.
-    - /bin : Binary, 기본적인 명령어
-    - /dev : Device, 물리적으로 연결된 하드웨어 관련 파일
-    - /etc : 환경 설정 파일
-    - /lib : Library, 커널이 필요로 하는 라이브러리 파일(shared object)
-    - /mnt: Mount, mount 명령어를 통해 직접 연결한 마운트 포인트가 저장됨 
+    - /bin : Binary, 주 명령어(cat, ls, cp등)의 실행 파일
+    - /dev : Device, 물리적으로 연결된 하드웨어를 다루기 위한 파일
+    - /etc : 리눅스와 애플리케이션 환경 설정 파일
+    - /lib : Library, 부팅 및 관리에 필요한 Shared library과 커널 모듈
+    - /mnt: Mount, 외부 저장장치와 같은 임시 파일 시스템의 마운트 포인트 수동 관리
+    - /media : 외부 저장장치가 연결될 때 자동으로 장치를 인식하고 마운트 포인트를 생성하는 디렉토리
     - /proc: Process, 현재 실행 중인 프로세스 정보
-    - /usr: User, 일반 사용자가 설치한 프로그램
+    - /usr: User, 일반 사용자가 설치한 애플리케이션 관련 파일
+    - /var : 애플리케이션 실행 중에 만들어진 데이터 및 로그 저장
 4. 현재 사용 중인 쉘과 사용 가능한 쉘의 목록을 확인하는 명령어를 각각 입력해주세요.
     - grep [user] /etc/passwd, cat /etc/shells
     - 쉘이란 무엇일까요?
