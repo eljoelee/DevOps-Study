@@ -106,9 +106,9 @@
     - Thrashing
         - 동시에 실행되는 프로세스 수가 어느정도 증가하면 CPU 이용률은 높아지나 필요 이상으로 증가하면 각 프로세스들이 사용할 수 있는 프레임의 수가 적어진다. 따라서, Page fault가 빈번하게 발생하고, Page In/Out이 잦아져 CPU 이용률이 떨어지므로 전체적인 성능이 저하된다.
     - Page fault frequency
-        ![Page fault frequency](https://user-images.githubusercontent.com/14902866/276626273-0276becd-188a-4d9a-8cd7-848f993ae1ab.png)
-            - 페이지 폴트율이 상한선(upper bound)보다 높아지면 해당 프로세스는 너무 적은 프레임을 갖고 있으므로 프레임의 수를 더 할당한다.
-            - 페이지 폴트율이 하한선(lower bound)보다 낮아지면 해당 프로세스는 너무 많은 프레임을 갖고 있으므로 프레임을 회수한다.
+          - 페이지 폴트율이 상한선(upper bound)보다 높아지면 해당 프로세스는 너무 적은 프레임을 갖고 있으므로 프레임의 수를 더 할당한다.
+          - 페이지 폴트율이 하한선(lower bound)보다 낮아지면 해당 프로세스는 너무 많은 프레임을 갖고 있으므로 프레임을 회수한다.
+          ![Page fault frequency](https://user-images.githubusercontent.com/14902866/276626273-0276becd-188a-4d9a-8cd7-848f993ae1ab.png)
 25. 유닉스 파일 시스템에 대해 설명해주세요.
     - inode 기반 파일시스템
         - 파일의 크기, 권한, 생성 시간과 같은 메타데이터와 블록으로 이루어진 자료구조
