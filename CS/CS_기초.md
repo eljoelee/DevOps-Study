@@ -150,6 +150,11 @@
     2. BIOS가 실행되면 POST(Power On Self Test)라는 과정을 진행하고 CPU를 제외한 하드웨어가 정상적으로 동작하는지 테스트를 수행한다.
         - 오류 발생 시 비프음이 울리고 오류 메시지와 함께 부팅이 중단된다.
     3. 테스트가 완료되면 BIOS는 사용자가 설정한 부팅 순서에 따라 보조기억장치를 선택하고 첫번째 섹터인 MBR(Master Boot Record)에 저장된 초기 부트로더를 실행한다.
-    4. 초기 부트로더는 2단계 부트로더(리눅스-GRUB, 윈도우-BOOTMGR)를 로드하고 해당 부트로더가 보조기억장치에서 OS 커널 이미지를 찾아 메인 메모리의 RAM 영역에 적재한다.
-        - MBR의 크기 제한 때문에 부트로더를 2단계로 나눈다.
-    5. OS가 초기화되고 구동한다.
+    4. 초기 부트로더는 2단계 부트로더(GRUB)를 로드하고 해당 부트로더가 보조기억장치에서 커널 이미지를 찾아 메인 메모리의 RAM 영역에 적재한다.
+        - MBR의 크기 제한(512bytes)때문에 부트로더를 2단계로 나눈다.
+    5. 커널은 루트 파일시스템을 마운트하고 하드웨어 드라이버 초기화를 수행한다. 이후 PID 1번인 init(또는 systemd) 프로세스를 실행한다.
+        - init : /sbin/init
+        - systemd : /usr/lib/systemd/systemd
+    6. init 또는 systemd 프로세스는 각각 설정한 Run Level 또는 Target(Unit)에 따라 필요한 스크립트와 서비스를 실행한다.
+        - init : /etc/inittab
+        - systemd : /etc/systemd/system
