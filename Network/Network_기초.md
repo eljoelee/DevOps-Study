@@ -5,7 +5,58 @@
 5. 소켓이란 무엇인지 설명해주세요.
     - User Mode의 애플리케이션이 Kernel Mode의 TCP/IP 프로토콜에 접근하기 위한 인터페이스 역할을 하는 파일
 6. L2 Switching 과정을 서술해주세요.
+    1. 송/수신지 MAC 주소가 담긴 이더넷 프레임을 케이블을 통해 전송
+    2. 테이블이 비어있다면 송신지 MAC 주소와 물리포트 번호 저장
+    3. 송신지를 제외한 모든 물리포트로 프레임 사본 전달 - Flooding, Broadcast
+    4. 사본을 전달받은 수신지는 응답 프레임을 케이블을 통해 전송
+        - 관계 없는 단말은 프레임 파기
+    5. 응답 프레임의 MAC 주소와 물리포트 번호 저장
+    6. 이후 스위치가 송/수신지 간 통신 직접 전송, 일정시간 미사용 시 해당 정보 삭제
 7. Wire Shark로 ARP 패킷을 읽고 통신 과정을 서술해주세요.
+    - ARP Request(Opcode : 1)
+        ```
+        Ethernet II, Src: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92), Dst: Broadcast (ff:ff:ff:ff:ff:ff)
+        Address Resolution Protocol (request)
+            Hardware type: Ethernet (1)
+            Protocol type: IPv4 (0x0800)
+            Hardware size: 6
+            Protocol size: 4
+            Opcode: request (1)
+            Sender MAC address: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92)
+            Sender IP address: 192.168.219.1
+            Target MAC address: 00:00:00_00:00:00 (00:00:00:00:00:00)
+            Target IP address: 192.168.219.106
+        ```
+    - ARP Reply(Opcode : 2)
+        ```
+        Ethernet II, Src: IntelCor_aa:a3:11 (80:45:dd:aa:a3:11), Dst: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92)
+        Address Resolution Protocol (reply)
+            Hardware type: Ethernet (1)
+            Protocol type: IPv4 (0x0800)
+            Hardware size: 6
+            Protocol size: 4
+            Opcode: reply (2)
+            Sender MAC address: IntelCor_aa:a3:11 (80:45:dd:aa:a3:11)
+            Sender IP address: 192.168.219.106
+            Target MAC address: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92)
+            Target IP address: 192.168.219.1
+        ```
+        1. 데이터 송신 시 송신측 단말은 IP 패킷에 포함된 수신지 IP 주소를 자신의 ARP 테이블에서 조회 후 없는 경우 ARP Request 준비
+        2. ARP Request의 각 필드를 조합한다.
+            - Opcode : 1(ARP Request)
+            - Sender MAC/IP 주소 : 송신측 단말 MAC/IP 주소 
+            - Target MAC/IP 주소 : Dummy MAC 주소(00:00...) / 수신지 IP 주소
+        3. 같은 네트워크의 모든 단말에 ARP Request를 전달한다.
+            - 이더넷 프레임의 수신지 MAC 주소 : Broadcast 주소(ff:ff...)
+            - 수신측 단말은 요청을 받아들이고 ARP Reply 준비
+            - 그외 단말은 프레임을 파기한다.
+        4. ARP Reply의 각 필드를 조합한다.
+            - Opcode : 2(ARP Reply)
+            - Sender MAC/IP 주소 : 수신측 단말 MAC/IP 주소 
+            - Target MAC/IP 주소 : 송신측 단말 MAC/IP 주소
+        5. 송신측 단말에 ARP Reply를 전달한다.
+            - 이더넷 프레임의 수신지 MAC 주소 : 송신측 단말 MAC 주소 - Unicast
+        6. 송신측 단말은 전달받은 ARP Reply의 Sender MAC/IP 주소를 인식하고 ARP 테이블에 일정 기간 등록한다.(ARP Cache)
 8. IPv4 패킷의 헤더 중 다음 필드의 설명과 문항을 답변해주세요.
     ![IP Header](https://user-images.githubusercontent.com/14902866/277317420-e093c5ea-cc8a-4e7e-a7c9-3c6abd1fb005.png)
     - Version
