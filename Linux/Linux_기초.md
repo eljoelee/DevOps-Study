@@ -72,6 +72,7 @@
 9. curl, telnet, ping 차이점을 설명해주세요.
     - curl : Application(HTTP 등) Layer 동작
     - telnet : Transport(TCP) Layer 동작
+        - 데이터를 평문으로 송/수신하므로 패킷 스니핑 위험이 있다.
     - ping : Network Layer(ICMP) 동작 - 포트 사용 X
 10. yum 패키지를 통해 httpd를 설치하고, 80 포트를 개방하여 서비스를 실행해주세요.
     - yum과 apt의 차이점은 무엇인가요?
