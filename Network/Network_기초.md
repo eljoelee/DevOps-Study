@@ -143,11 +143,11 @@
 15. TCP 3way Handshaking 과정을 서술해주세요.
     - 클라이언트는 CLOSED, 서버는 LISTEN(연결 대기) 상태
         1. 클라이언트는 시퀀스 넘버(SYN)를 랜덤하게 생성하고 서버로 전송(SYN_SENT)한다.
-        2. 클라이언트의 시퀀스 넘버를 전달받은(SYN_RCVD) 서버는 해당 값에 1을 더한 값(ACK)을 응답으로 전송하고 서버 또한 시퀀스 넘버(SYN)를 랜덤하게 생성하여 클라이언트로 전송한다.
-        3. 클라이언트는 서버로부터 응답 값(ACK)을 받으면 연결 완료(ESTABLISHED)로 판단하고, 서버의 시퀀스 넘버에 1을 더한 값을 응답으로 전송한다.
-        4. 클라이언트의 응답 값(ACK)을 전달받은 서버는 연결 완료(ESTABLISHED)로 판단하고 데이터 전송을 시작한다.
-        - **Rount Trip Time**으로 인해 클라이언트/서버의 연결 완료 시점이 다르다.
-        - 클라이언트와 서버는 시퀀스 넘버뿐만 아니라 **MSS(Maximum Segment Size)**도 교환한다.
+        2. 서버는 클라이언트의 시퀀스 넘버를 전달 받으면(SYN_RCVD) 해당 값에 1을 더해 응답(ACK)으로 전송하고 시퀀스 넘버(SYN)를 랜덤하게 생성하여 클라이언트로 전송한다.
+        3. 클라이언트는 서버로부터 응답 값을 받으면 연결 완료(ESTABLISHED)로 판단하고 서버의 시퀀스 넘버에 1을 더해 응답(ACK)으로 전송한다.
+        4. 서버는 클라이언트로부터 응답 값을 받으면 연결 완료(ESTABLISHED)로 판단하고 데이터 전송을 시작한다.
+        - **Round Trip Time**으로 인해 클라이언트/서버의 연결 완료 시점이 다르다.
+        - 클라이언트와 서버는 시퀀스 넘버뿐만 아니라 **MSS**(Maximum Segment Size)도 교환한다.
 16. HTTP/1.0, HTTP/1.1, HTTP/2, HTTP/3의 특징을 각각 설명해주세요.
     - HTTP/1.0
         - 요청할 때마다 TCP 3Way Handshake를 반복해야 하므로 RTT 증가
@@ -156,31 +156,57 @@
             - HTTP/1.1부터 표준 기능으로 적용하여 지정한 값만큼 TCP 연결을 유지한다.
         - Pipeline
             - 요청에 대한 응답을 기다리지 않고 다음 요청을 송신하는 기능
-            - HTTP/1.1의 경우 단일 TCP 연결에서 요청/응답을 병렬 처리할 수 없고 순서 번호를 부여하는 특성으로 인해 각 요청/응답은 순차적으로 처리되므로 이전 요청을 처리하는 시간이 길어지면 다음 요청을 처리할 수 없으므로 **Head of Line Blocking** 발생
+             - HTTP/1.1의 경우 단일 TCP 연결에서 요청/응답을 병렬 처리할 수 없으므로 순서에 따라 이전 요청 처리가 지연되면 다음 요청을 처리할 수 없는 **Head of Line Blocking** 발생
         - HTTP Header 미압축 전송
-            - 메시지 바디(HTTP Payload)는 압축 대상이었으나 메시지 헤더는 대상이 아님
+            - 메시지 본문(HTTP Payload)은 압축 대상이나 메시지 헤더는 대상이 아님
             - 같은 내용의 메시지 헤더를 평문으로 수차례 교환하기 때문에 낭비 발생
     - HTTP/2
         - 멀티플렉싱
-            - 단일 TCP 연결 내 stream이라는 여러 개의 가상 채널을 생성하여 요청/응답을 병렬적으로 수행할 수 있다.
+            - 단일 TCP 연결에서 **Stream**이라는 여러 개의 요청/응답 쌍을 생성하여 병렬 처리하는 방식
+            - 클라이언트/서버는 Steam ID를 통해 각 요청/응답을 식별하고 처리한다.
         - HPACK
             - 메시지 헤더(HTTP header)를 압축하는 기능을 추가하여 헤더의 전송량을 줄임
         - 서버 푸시
-            - 클라이언트가 최초로 요청한 콘텐츠를 해석하고 다음에 올 요청에 대한 응답을 요청이 오기 전에 전송함.
-            - html 파일 요청 후 해당 파일에 연결된 css, js 파일을 요청 전에 미리 응답하여 전송함
+            - 서버가 클라이언트의 요청에 미리 응답을 전송하는 방식
+            - HTML 파일 요청 후 연결된 CSS, JS 파일을 추가로 요청 하기 전에 미리 전송함
     - HTTP/3
         - QUIC라는 UDP 기반 프로토콜 사용하여 TCP, TLS Handshake 과정에 걸리는 시간을 줄여 더 많은 HTTP 데이터를 보낼 수 있도록 함
 17. HTTP Header 중 다음과 같은 헤더를 설명해주세요.
-    - Request Header 中
-        - Host
-        - Accept
-        - Referer
-        - User Agent
-    - Response Header 中
-        - Keep-Alive
-    - General Header 中
-        - Cache-Control
-    - X-Forwarded-For
+    - Request Header
+        - Host : 전체 도메인 네임(FQDN)과 포트 번호
+        - Accept : 클라이언트가 처리할 수 있는 데이터 타입(MIME Type : text/html, application/json...)
+        - Referer : 직전에 연결된 링크 주소
+        - User Agent : 브라우저, OS등 사용자 환경 정보
+    - Response Header
+        - Keep-Alive : TCP 연결 유지 시간
+    - General Header
+        - Cache-Control : 캐싱 여부, 유지 시간 등 브라우저와 서버의 캐시를 제어하기 위한 헤더
+    - X-Forwarded-For : 프록시, 로드밸런서를 통해 서버에 접속하는 클라이언트의 원래 IP 주소를 전달하는 헤더
 18. 쿠키와 세션의 차이점을 설명해주세요.
+    - 쿠키
+        - 클라이언트의 브라우저에 저장되는 데이터
+        - 브라우저를 종료해도 데이터가 일정 시간동안 유지된다.
+        - 클라이언트에 저장하므로 보안에 취약하다.
+    - 세선
+        - 서버에서 관리하는 데이터
+        - 브라우저를 종료하면 데이터는 유지되지 않는다.
+        - 세션 ID를 통해 클라이언트를 식별하고 요청을 처리한다.
+        - 서버에 저장하므로 비교적 안전하다.
 19. URL과 URI의 차이점을 설명해주세요.
+    - URL
+        - 리소스 위치(Locator)
+    - URI
+        - URL + 리소스 식별자(Identifier)
+    - https://search.naver.com/search.naver?query=순대
+        URL : https://search.naver.com/search.naver
+        URI : https://search.naver.com/search.naver?query=순대
 20. 브라우저의 주소창에 naver.com을 쳤을 때 어떤 과정을 통해 접속하는지 서술해주세요.
+    1. 브라우저는 네트워크에서 연결할 서버를 파악하기 위해 입력한 도메인으로 웹 사이트를 호스팅하는 서버의 IP 주소를 조회해야 한다.
+    2. 클라이언트는 도메인 캐싱(Local DNS Cache) 여부와 /etc/hosts 파일의 IP 주소 매핑 정보를 확인하고 일치하는 정보가 없다면 ISP가 관리하는 Local DNS 서버에 요청을 전달한다.
+        - 리눅스 : /etc/resolv.conf
+        - 윈도우 : 네트워크 연결 > 프로토콜 속성 > DNS 서버 주소
+    3. Local DNS 서버는 해당 도메인 주소가 있다면 IP를 반환하고, 없다면 Root > TLD(.com) > SLD(naver.com) 순으로 요청 후 응답을 통해 IP 주소를 확보하고 일정 기간 캐싱한다.
+    4. TCP 연결을 수행하여 IP 주소가 가리키는 서버를 찾고 웹 페이지의 콘텐츠를 요청(HTTP Request)한다.
+        - 이 때, Content Delivery Network를 도입한 경우 클라이언트의 IP 주소가 위치한 지역에서 현재 접속이 원활한 서버의 IP를 알려주고, 해당 서버를 통해 콘텐츠를 요청한다.
+    5. 서버는 요청 헤더와 본문 내용을 기반으로 콘텐츠를 브라우저에게 반환(HTTP Response)한다.
+    6. 브라우저는 반환받은 HTML, CSS, JS와 같은 콘텐츠를 렌더링하고 웹 페이지를 보여준다.
