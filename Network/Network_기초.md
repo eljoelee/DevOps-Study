@@ -197,9 +197,9 @@
         - 리소스 위치(Locator)
     - URI
         - URL + 리소스 식별자(Identifier)
-    - https://search.naver.com/search.naver?query=순대
-        URL : https://search.naver.com/search.naver
-        URI : https://search.naver.com/search.naver?query=순대
+    - example : https://search.naver.com/search.naver?query=순대
+        - URL : https://search.naver.com/search.naver
+        - URI : https://search.naver.com/search.naver?query=순대
 20. 브라우저의 주소창에 naver.com을 쳤을 때 어떤 과정을 통해 접속하는지 서술해주세요.
     1. 브라우저는 네트워크에서 연결할 서버를 파악하기 위해 입력한 도메인으로 웹 사이트를 호스팅하는 서버의 IP 주소를 조회해야 한다.
     2. 클라이언트는 도메인 캐싱(Local DNS Cache) 여부와 /etc/hosts 파일의 IP 주소 매핑 정보를 확인하고 일치하는 정보가 없다면 ISP가 관리하는 Local DNS 서버에 요청을 전달한다.
