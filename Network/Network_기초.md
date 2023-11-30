@@ -1,107 +1,31 @@
 1. 네트워크 방식 중 패킷 교환 방식에 대해 설명해주세요.
-    - 데이터를 패킷이라는 작은 단위로 분할하고 송/수신지 정보가 담긴 헤더를 붙여 전송하는 방식
 2. 프로토콜이란 무엇인지 설명해주세요.
-    - 패킷을 처리하기 위한 규칙
-    - 계층 구조 : 프로토콜로 정의된 다양한 통신 기능을 계층적으로 정의한 구조
 3. PDU(Protocol Data Unit)를 설명해주세요.
-    - 각각의 계층에서 처리하는 헤더와 페이로드로 구성된 데이터 단위
-        - 데이터링크 : 프레임
-        - 네트워크 : 패킷
-        - 트랜스포트 : 세그먼트 또는 데이터그램
-        - 애플리케이션 : 스트림 또는 메시지
-    - 캡슐화 > 각 계층에서 페이로드에 헤더를 붙인 PDU를 생성하여 하위 계층 전달
-    - 비캡슐화 > 각 계층에서 PDU로부터 헤더를 제거한 페이로드만 상위 계층 전달
 4. LAN과 WAN에 대해 설명해주세요.
-    - LAN : 한정된 범위(집, 회사)의 물리적 네트워크(이더넷) 구성
-    - WAN : ISP에 의해 여러 개의 LAN으로 연결된 논리적 네트워크 구성
 5. 소켓이란 무엇인지 설명해주세요.
-    - User Mode의 애플리케이션이 Kernel Mode의 TCP/IP 프로토콜에 접근하기 위한 인터페이스 역할을 수행하는 파일
 6. L2 Switching 과정을 서술해주세요.
-    1. 송/수신지 MAC 주소가 담긴 이더넷 프레임을 케이블을 통해 전송
-    2. 테이블이 비어있다면 송신지 MAC 주소와 물리포트 번호 저장
-    3. 송신지를 제외한 모든 물리포트로 프레임 사본 전달 - Flooding, Broadcast
-    4. 사본을 전달받은 수신지는 응답 프레임을 케이블을 통해 전송
-        - 관계 없는 단말은 프레임 파기
-    5. 응답 프레임의 MAC 주소와 물리포트 번호 저장
-    6. 이후 스위치가 송/수신지 간 통신 직접 전송, 일정시간 미사용 시 해당 정보 삭제
 7. Wire Shark로 ARP 패킷을 읽고 통신 과정을 서술해주세요.
-    - ARP Request(Opcode : 1)
-        ```
-        Ethernet II, Src: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92), Dst: Broadcast (ff:ff:ff:ff:ff:ff)
-        Address Resolution Protocol (request)
-            Hardware type: Ethernet (1)
-            Protocol type: IPv4 (0x0800)
-            Hardware size: 6
-            Protocol size: 4
-            Opcode: request (1)
-            Sender MAC address: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92)
-            Sender IP address: 192.168.219.1
-            Target MAC address: 00:00:00_00:00:00 (00:00:00:00:00:00)
-            Target IP address: 192.168.219.106
-        ```
-    - ARP Reply(Opcode : 2)
-        ```
-        Ethernet II, Src: IntelCor_aa:a3:11 (80:45:dd:aa:a3:11), Dst: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92)
-        Address Resolution Protocol (reply)
-            Hardware type: Ethernet (1)
-            Protocol type: IPv4 (0x0800)
-            Hardware size: 6
-            Protocol size: 4
-            Opcode: reply (2)
-            Sender MAC address: IntelCor_aa:a3:11 (80:45:dd:aa:a3:11)
-            Sender IP address: 192.168.219.106
-            Target MAC address: Mercury_9a:e6:92 (88:3c:1c:9a:e6:92)
-            Target IP address: 192.168.219.1
-        ```
-        1. 데이터 송신 시 송신측 단말은 IP 패킷에 포함된 수신지 IP 주소를 자신의 ARP 테이블에서 조회 후 없는 경우 ARP Request 준비
-        2. ARP Request의 각 필드를 조합한다.
-            - Opcode : 1(ARP Request)
-            - Sender MAC/IP 주소 : 송신측 단말 MAC/IP 주소 
-            - Target MAC/IP 주소 : Dummy MAC 주소(00:00...) / 수신지 IP 주소
-        3. 같은 네트워크의 모든 단말에 ARP Request를 전달한다.
-            - 이더넷 프레임의 수신지 MAC 주소 : Broadcast 주소(ff:ff...)
-            - 수신측 단말은 요청을 받아들이고 ARP Reply 준비
-            - 그외 단말은 프레임을 파기한다.
-        4. ARP Reply의 각 필드를 조합한다.
-            - Opcode : 2(ARP Reply)
-            - Sender MAC/IP 주소 : 수신측 단말 MAC/IP 주소 
-            - Target MAC/IP 주소 : 송신측 단말 MAC/IP 주소
-        5. 송신측 단말에 ARP Reply를 전달한다.
-            - 이더넷 프레임의 수신지 MAC 주소 : 송신측 단말 MAC 주소 - Unicast
-        6. 송신측 단말은 전달받은 ARP Reply의 Sender MAC/IP 주소를 인식하고 ARP 테이블에 일정 기간 등록한다.(ARP Cache)
 8. IPv4 패킷의 헤더 중 다음 필드의 설명과 문항을 답변해주세요.
     ![IP Header](https://user-images.githubusercontent.com/14902866/277317420-e093c5ea-cc8a-4e7e-a7c9-3c6abd1fb005.png)
-    - Version : IPv4인지 IPv6인지 나타내는 필드
-        - IPv4의 값은 얼마일까요? > 4(0100)
-    - IHL : IPv4의 헤더 길이
+    - Version
+        - IPv4의 값은 얼마일까요?
+    - IHL
         - IPv4 헤더 기본 길이는 얼마일까요?
-            - 4bytes * 5 = 20bytes
-    - Packet Length : IPv4 헤더와 페이로드를 합친 패킷 전체 길이
+    - Packet Length
         - MTU가 포함된 패킷의 길이 값은 얼마일까요? 
-            - 기본 1500bytes
-    - TTL : 경유하는 라우터 수(Hop Count)
+    - TTL
         - 만약 TTL 값이 0이 되면 어떤 일이 발생할까요?
-            - 값이 0이 되는 대상 라우터는 패킷을 파기하고 **Time-to-live exceed**라는 ICMPv4 패킷을 송신지로 전달한다.
-    - Protocol Number : 페이로드가 어떤 프로토콜로 구성되어 있는지 표현
+    - Protocol Number
         - TCP는 몇 번일까요?
-            - 6번
 9. Broadcast와 Unicast의 차이점을 설명해주세요.
-    - Broadcast : 네트워크에 속한 모든 호스트에 패킷을 전송하는 방식
-    - Unicast : 송/수신자간 MAC 주소 기반으로 패킷을 일대일 교환하는 방식
 10. 다음과 같은 서브넷 마스크에서 네트워크와 호스트 영역을 구분하여 서술해주세요.
     > 192.168.100.1/24
-    - 서브넷 마스크 : 255.255.255.0
-    - 네트워크 영역 : ***192.168.100***.0
-    - 호스트 영역 : 192.168.100.***1***
-        - 192.168.100.X 네트워크 범위에 속하는 192.168.100.1 호스트
 11. 각 IPv4 예약 주소 역할을 설명해주세요.
-    - 0.0.0.0/8 : IP 주소를 할당 받기 전 임시로 사용하는 주소
-    - 10.0.0.0/8 : Private IP 주소
-    - 127.0.0.0/8 : Loopback, 자기 자신을 가리키는 주소
-    - 255.255.255.255/32 : Limited Broadcast Address, 네트워크에 속한 모든 호스트에 패킷 송신 용도
+    - 0.0.0.0/8
+    - 10.0.0.0/8
+    - 127.0.0.0/8
+    - 255.255.255.255/32
 12. 동적 라우팅이란 무엇일까요? 그리고 어떤 장점이 있나요?
-    - 근접한 라우터끼리 자신이 가진 경로 정보를 교환하여 자동으로 라우팅 테이블을 만드는 방식
-    - 새 라우터 추가 시 해당 라우터와 경로 정보를 교환하여 전체적으로 라우팅 테이블을 업데이트하므로 수동으로 설정할 필요가 없다.
 13. 다음은 Windows에서 route print 명령어를 수행한 결과입니다. 아래 테이블을 토대로 클라이언트에서 수신지 주소가 '223.130.200.104'인 IP 패킷을 생성한 경우 트래픽 흐름을 설명해주세요.
     ```
     IPv4 경로 테이블
@@ -126,87 +50,20 @@
     255.255.255.255    255.255.255.255  연결됨          172.26.16.1        5256
     ===========================================================================
     ```
-    1. 라우팅 테이블을 확인한다.
-    2. 네트워크 대상 및 마스크와 일치하는 경로가 없으므로 기본 경로를 사용한다.
-    3. 기본 경로(0.0.0.0/0, 모든 네트워크)의 Next Hop인 기본 게이트웨이(192.168.219.1)로 수신지 주소를 포함하는 IP 패킷을 송신한다.
-    4. 해당 게이트웨이(로컬 네트워크 라우터)는 패킷을 받아 외부 네트워크로 전달한다.
-        - 이 때 NAT를 수행하여 사설 IP를 공인 IP로 변환하여 진행한다.
-    5. 외부 네트워크의 여러 라우터들을 거치고 수신지 주소에 해당하는 서버에 패킷이 도달한다.
-    6. 서버는 응답 패킷을 송신하고 이를 게이트웨이가 전달 받아 인터페이스(192.168.219.106)로 전달한다.
 14. TCP와 UDP의 차이점은 무엇일까요? 그리고 각각 이를 기반으로 동작하는 대표 프로토콜 하나를 설명해주세요.
-    - TCP : 연결 지향, 순서 보장 : 세그멘테이션 시 바이트 수만큼 순서 번호 부여
-        - 사이즈가 100bytes인 경우 > 100, 101, …(100 + n)
-        - HTTP : HTML, CSS, JS와 같은 파일을 정확하고 안전하게 전달해야 올바른 웹 페이지를 표시할 수 있다.
-    - UDP : 비연결 지향, 순서 보장하지 않음 : 빠른 전송 속도
-        - DNS : 쿼리의 크기가 작고 빠른 응답이 필요하므로 UDP를 사용한다.
-            - 크기가 크거나 재전송이 필요한 경우엔 TCP를 사용한다.
 15. TCP 3way Handshaking 과정을 서술해주세요.
-    - 클라이언트는 CLOSED, 서버는 LISTEN(연결 대기) 상태
-        1. 클라이언트는 시퀀스 넘버(SYN)를 랜덤하게 생성하고 서버로 전송(SYN_SENT)한다.
-        2. 서버는 클라이언트의 시퀀스 넘버를 전달 받으면(SYN_RCVD) 해당 값에 1을 더해 응답(ACK)으로 전송하고 시퀀스 넘버(SYN)를 랜덤하게 생성하여 클라이언트로 전송한다.
-        3. 클라이언트는 서버로부터 응답 값을 받으면 연결 완료(ESTABLISHED)로 판단하고 서버의 시퀀스 넘버에 1을 더해 응답(ACK)으로 전송한다.
-        4. 서버는 클라이언트로부터 응답 값을 받으면 연결 완료(ESTABLISHED)로 판단하고 데이터 전송을 시작한다.
-        - **Round Trip Time**으로 인해 클라이언트/서버의 연결 완료 시점이 다르다.
-        - 클라이언트와 서버는 시퀀스 넘버뿐만 아니라 **MSS**(Maximum Segment Size)도 교환한다.
 16. HTTP/1.0, HTTP/1.1, HTTP/2, HTTP/3의 특징을 각각 설명해주세요.
-    - HTTP/1.0
-        - 요청할 때마다 TCP 3Way Handshake를 반복해야 하므로 RTT 증가
-    - HTTP/1.1
-        - keep-alive header
-            - HTTP/1.1부터 표준 기능으로 적용하여 지정한 값만큼 TCP 연결을 유지한다.
-        - Pipeline
-            - 요청에 대한 응답을 기다리지 않고 다음 요청을 송신하는 기능
-             - HTTP/1.1의 경우 단일 TCP 연결에서 요청/응답을 병렬 처리할 수 없으므로 순서에 따라 이전 요청 처리가 지연되면 다음 요청을 처리할 수 없는 **Head of Line Blocking** 발생
-        - HTTP Header 미압축 전송
-            - 메시지 본문(HTTP Payload)은 압축 대상이나 메시지 헤더는 대상이 아님
-            - 같은 내용의 메시지 헤더를 평문으로 수차례 교환하기 때문에 낭비 발생
-    - HTTP/2
-        - 멀티플렉싱
-            - 단일 TCP 연결에서 **Stream**이라는 여러 개의 요청/응답 쌍을 생성하여 병렬 처리하는 방식
-            - 클라이언트/서버는 Steam ID를 통해 각 요청/응답을 식별하고 처리한다.
-        - HPACK
-            - 메시지 헤더(HTTP header)를 압축하는 기능을 추가하여 헤더의 전송량을 줄임
-        - 서버 푸시
-            - 서버가 클라이언트의 요청에 미리 응답을 전송하는 방식
-            - HTML 파일 요청 후 연결된 CSS, JS 파일을 추가로 요청 하기 전에 미리 전송함
-    - HTTP/3
-        - QUIC라는 UDP 기반 프로토콜 사용하여 TCP, TLS Handshake 과정에 걸리는 시간을 줄여 더 많은 HTTP 데이터를 보낼 수 있도록 함
 17. HTTP Header 중 다음과 같은 헤더를 설명해주세요.
     - Request Header
-        - Host : 전체 도메인 네임(FQDN)과 포트 번호
-        - Accept : 클라이언트가 처리할 수 있는 데이터 타입(MIME Type : text/html, application/json...)
-        - Referer : 직전에 연결된 링크 주소
-        - User Agent : 브라우저, OS등 사용자 환경 정보
+        - Host
+        - Accept
+        - Referer
+        - User Agent
     - Response Header
-        - Keep-Alive : TCP 연결 유지 시간
+        - Keep-Alive
     - General Header
-        - Cache-Control : 캐싱 여부, 유지 시간 등 브라우저와 서버의 캐시를 제어하기 위한 헤더
-    - X-Forwarded-For : 프록시, 로드밸런서를 통해 서버에 접속하는 클라이언트의 원래 IP 주소를 전달하는 헤더
+        - Cache-Control
+    - X-Forwarded-For
 18. 쿠키와 세션의 차이점을 설명해주세요.
-    - 쿠키
-        - 클라이언트의 브라우저에 저장되는 데이터
-        - 브라우저를 종료해도 데이터가 일정 시간동안 유지된다.
-        - 클라이언트에 저장하므로 보안에 취약하다.
-    - 세선
-        - 서버에서 관리하는 데이터
-        - 브라우저를 종료하면 데이터는 유지되지 않는다.
-        - 세션 ID를 통해 클라이언트를 식별하고 요청을 처리한다.
-        - 서버에 저장하므로 비교적 안전하다.
 19. URL과 URI의 차이점을 설명해주세요.
-    - URL
-        - 리소스 위치(Locator)
-    - URI
-        - URL + 리소스 식별자(Identifier)
-    - example : https://search.naver.com/search.naver?query=순대
-        - URL : https://search.naver.com/search.naver
-        - URI : https://search.naver.com/search.naver?query=순대
 20. 브라우저의 주소창에 naver.com을 쳤을 때 어떤 과정을 통해 접속하는지 서술해주세요.
-    1. 브라우저는 네트워크에서 연결할 서버를 파악하기 위해 입력한 도메인으로 웹 사이트를 호스팅하는 서버의 IP 주소를 조회해야 한다.
-    2. 클라이언트는 도메인 캐싱(Local DNS Cache) 여부와 /etc/hosts 파일의 IP 주소 매핑 정보를 확인하고 일치하는 정보가 없다면 ISP가 관리하는 Local DNS 서버에 요청을 전달한다.
-        - 리눅스 : /etc/resolv.conf
-        - 윈도우 : 네트워크 연결 > 프로토콜 속성 > DNS 서버 주소
-    3. Local DNS 서버는 해당 도메인 주소가 있다면 IP를 반환하고, 없다면 Root > TLD(.com) > SLD(naver.com) 순으로 요청 후 응답을 통해 IP 주소를 확보하고 일정 기간 캐싱한다.
-    4. TCP 연결을 수행하여 IP 주소가 가리키는 서버를 찾고 웹 페이지의 콘텐츠를 요청(HTTP Request)한다.
-        - 이 때, Content Delivery Network를 도입한 경우 클라이언트의 IP 주소가 위치한 지역에서 현재 접속이 원활한 서버의 IP를 알려주고, 해당 서버를 통해 콘텐츠를 요청한다.
-    5. 서버는 요청 헤더와 본문 내용을 기반으로 콘텐츠를 브라우저에게 반환(HTTP Response)한다.
-    6. 브라우저는 반환받은 HTML, CSS, JS와 같은 콘텐츠를 렌더링하고 웹 페이지를 보여준다.
