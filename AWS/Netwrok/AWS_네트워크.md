@@ -21,7 +21,7 @@
     > Application Loadbalancer의 리스너 규칙엔 어떤 종류가 있을까요?
 9. VPC와 온프레미스간 통신을 수행하려면 어떤 리소스를 사용해야 하는지와 각 리소스의 차이점은 무엇인지 작성해주세요.
 10. 서로 다른 VPC간 통신을 수행하려면 어떤 리소스를 사용해야 하는지와 각 리소스의 차이점은 무엇인지 작성해주세요.
-    - [스택](https://github.com/eljoelee/DevOps-Study/blob/main/AWS/Network_10.yaml)을 배포하여 두 VPC 내 인스턴스간 ping 명령어를 수행한 결과를 작성해주세요.
+    - [스택](https://github.com/eljoelee/DevOps-Study/blob/main/AWS/Network_10.yaml)을 배포하고 두 VPC를 연결 후 인스턴스간 ping 명령어를 수행한 결과를 작성해주세요.
 11. S3, Cloudfront를 활용하여 간단한 웹 페이지(index.html)를 호스팅해주세요.
     - S3와 Cloudfront에 CORS 설정을 적용해주세요.
     - 무료 도메인 제공 사이트([Link](https://iter.kr/%EB%AC%B4%EB%A3%8C-%EB%8F%84%EB%A9%94%EC%9D%B8-%ED%94%84%EB%A6%AC%EB%86%88/))를 통해 도메인을 제공받고 Route53으로 해당 도메인과 호스팅 중인 사이트를 연결해주세요.
