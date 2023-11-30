@@ -54,12 +54,3 @@
     - 서버 접속 : ALB-DNS/session_check.jsp
     - **<span style="color:red">스택 삭제 전, 콘솔에서 생성한 Elasticache 삭제를 먼저 진행해주세요.</span>**
 3. MSA 4항에서 배포한 ECS의 빌드/배포 파이프라인을 CodeSeries(Commit, Build, Deploy, Pipeline)로 구축해주세요.
-## Security
-1. 인증과 인가의 차이점을 서술해주세요.
-2. OATH란 무엇인가요?
-    - 스택을 배포하고 Keycloak으로 Grafana와 FastAPI OATH 인증을 구성해주세요.
-3. IAM의 각 요소에 대해 서술해주세요.
-    - User
-    - Group
-    - Policy
-    - Role
