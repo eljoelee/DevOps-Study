@@ -2,8 +2,8 @@
 ## MSA
 1. AWS Lambda 실행 과정을 Cold Start와 Warm Start로 구분지어 서술해주세요.
 2. AWS Lambda의 Layer란 무엇인가요?
-    - Python > requests 모듈을 Layer로 등록해주세요.
-3. API Gateway를 구성하고 도메인을 등록해주세요.
+    - Python > requests 모듈을 Layer로 등록하고 간단한 API Call 결과를 출력하는 로직을 작성해보세요.
+3. 위 2항 Lambda를 API Gateway로 연결하고 도메인 등록 및 테스트 결과를 공유해주세요.
 4. ECS와 EKS의 차이점은 무엇인가요?
 ## System Architecture
 1. Single Point of Failure란 무엇인가요?
