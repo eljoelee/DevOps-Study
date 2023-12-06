@@ -112,10 +112,9 @@
     - MiB : 메모리 사용률
         - buff/cache : bufferd I/O 메모리 + 캐시 메모리 사용률
     - PR : CPU 스케줄링 우선순위
-    - VIRT : 프로세스가 사용하는 가상 메모리 양(code, data, heap, stack)
-    - RES : 프로세스가 사용하는 non-swapped 물리 메모리(RAM) 양
-        - non-swapped Physical Memory : Swap-out되지 않고 RAM에 남아있는 메모리
-    - SHR : 다른 프로세스와 공유하는 공유 메모리 양
+    - VIRT : 프로세스에 할당된 가상 메모리 전체 크기(code, data, heap, stack)
+    - RES : 가상 메모리 중 실제로 메모리에 올려서 사용하고 있는 물리 메모리 크기
+    - SHR : 다른 프로세스와 공유하는 공유 메모리 크기(glibc와 같은 리눅스 라이브러리 등)
     - MEM : 물리 메모리(RAM)에서 RES가 차지하는 비율
 12. 메모리 사용량을 확인하는 명령어를 입력하고 결과를 작성해주세요.
     - swap이란 항목은 무엇을 의미하는 걸까요?
